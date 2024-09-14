@@ -12,11 +12,12 @@ paths:
       - dashboard-controller
       operationId: getPrompt
       parameters:
-      - name: user_id
+      - name: userId
         in: query
         required: true
         schema:
-          type: string
+          type: integer
+          format: int64
       responses:
         "200":
           description: OK
@@ -49,13 +50,22 @@ paths:
       tags:
       - dashboard-controller
       operationId: recentPrompts
+      parameters:
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PromptResponse"
+                type: array
+                items:
+                  $ref: "#/components/schemas/PromptResponse"
 components:
   schemas:
     PromptRequest:
@@ -104,6 +114,10 @@ components:
           - COMPLETED
         metaData:
           type: string
+        tags:
+          type: array
+          items:
+            type: string
         errorMessage:
           type: string
         thumbnailUrl:
