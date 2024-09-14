@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# But don't ignore these files
+!.gitignore
+!LICENSE
+!merge-specs.sh
+!merge-specs.bat
+!README.md
+!sb-openapi-spec.yml
