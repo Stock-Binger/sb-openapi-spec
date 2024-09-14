@@ -3,20 +3,20 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-  - url: http://localhost:9091
-    description: Generated server url
+- url: http://localhost:9091
+  description: Generated server url
 paths:
   /v1/d/prompt:
     get:
       tags:
-        - dashboard-controller
+      - dashboard-controller
       operationId: getPrompt
       parameters:
-        - name: user_id
-          in: query
-          required: true
-          schema:
-            type: string
+      - name: user_id
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -28,7 +28,7 @@ paths:
                   $ref: "#/components/schemas/PromptResponse"
     post:
       tags:
-        - dashboard-controller
+      - dashboard-controller
       operationId: prompt
       requestBody:
         content:
@@ -47,7 +47,7 @@ paths:
   /v1/d/recent:
     get:
       tags:
-        - dashboard-controller
+      - dashboard-controller
       operationId: recentPrompts
       responses:
         "200":
@@ -96,12 +96,12 @@ components:
         status:
           type: string
           enum:
-            - CREATED
-            - QUERY_GENERATION
-            - QUERY_GENERATION_FAILED
-            - DATA_COLLECTION
-            - DATA_COLLECTION_FAILED
-            - COMPLETED
+          - CREATED
+          - QUERY_GENERATION
+          - QUERY_GENERATION_FAILED
+          - DATA_COLLECTION
+          - DATA_COLLECTION_FAILED
+          - COMPLETED
         metaData:
           type: string
         errorMessage:
