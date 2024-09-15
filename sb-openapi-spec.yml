@@ -10,23 +10,31 @@ paths:
     get:
       tags:
         - dashboard-controller
-      operationId: getPrompt
+      operationId: getUserPrompts
       parameters:
-        - name: userId
-          in: query
-          required: true
+        - name: X-User-Id
+          in: header
+          required: false
           schema:
             type: integer
             format: int64
+            default: 1001
+        - name: X-Group-Id
+          in: header
+          required: false
+          schema:
+            type: array
+            default: "[0, 1]"
+            items:
+              type: integer
+              format: int64
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PromptResponse"
+                $ref: "#/components/schemas/ScrollableListPromptResponse"
     post:
       tags:
         - dashboard-controller
@@ -45,27 +53,35 @@ paths:
               schema:
                 type: integer
                 format: int64
-  /v1/d/recent:
+  /v1/d/prompt/all:
     get:
       tags:
         - dashboard-controller
-      operationId: recentPrompts
+      operationId: getAllPrompts
       parameters:
-        - name: userId
-          in: query
-          required: true
+        - name: X-User-Id
+          in: header
+          required: false
           schema:
             type: integer
             format: int64
+            default: 1001
+        - name: X-Group-Id
+          in: header
+          required: false
+          schema:
+            type: array
+            default: "[0, 1]"
+            items:
+              type: integer
+              format: int64
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PromptResponse"
+                $ref: "#/components/schemas/ScrollableListPromptResponse"
 components:
   schemas:
     PromptRequest:
@@ -90,6 +106,7 @@ components:
             rawOffset:
               type: integer
               format: int32
+    AttributeValue: {}
     PromptResponse:
       properties:
         userId:
@@ -122,3 +139,13 @@ components:
           type: string
         thumbnailUrl:
           type: string
+    ScrollableListPromptResponse:
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PromptResponse"
+        offsetKey:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/AttributeValue"
