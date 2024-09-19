@@ -1,0 +1,179 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: https://app.stockbinger.com
+    description: Generated server url
+  - url: https://app.stockbinger.com
+    description: Generated server url
+tags:
+  - name: dashboard-controller
+    x-displayName: dashboard-controller
+  - name: customer-controller
+    x-displayName: customer-controller
+paths:
+  /v1/d/prompt:
+    get:
+      tags:
+        - dashboard-controller
+      operationId: getUserPrompts
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScrollableListPromptResponse'
+    post:
+      tags:
+        - dashboard-controller
+      operationId: prompt
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromptRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+  /v1/d/prompt/all:
+    get:
+      tags:
+        - dashboard-controller
+      operationId: getAllPrompts
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScrollableListPromptResponse'
+  /u:
+    get:
+      tags:
+        - customer-controller
+      operationId: getSubscription
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+  /u/profile:
+    get:
+      tags:
+        - customer-controller
+      operationId: profile
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema: {}
+components:
+  schemas:
+    PromptRequest:
+      properties:
+        userId:
+          type: integer
+          format: int64
+        groupId:
+          type: integer
+          format: int64
+        prompt:
+          type: string
+        timeZone:
+          properties:
+            displayName:
+              type: string
+            id:
+              type: string
+            dstsavings:
+              type: integer
+              format: int32
+            rawOffset:
+              type: integer
+              format: int32
+    PromptResponse:
+      properties:
+        userId:
+          type: integer
+          format: int64
+        groupId:
+          type: integer
+          format: int64
+        prompt:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - CREATED
+            - QUERY_GENERATION
+            - QUERY_GENERATION_FAILED
+            - DATA_COLLECTION
+            - DATA_COLLECTION_FAILED
+            - COMPLETED
+        metaData:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        errorMessage:
+          type: string
+        thumbnailUrl:
+          type: string
+    ScrollableListPromptResponse:
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromptResponse'
+        nextOffset:
+          type: string
+    SubscriptionResponse:
+      properties:
+        userId:
+          type: integer
+          format: int64
+        plan:
+          type: string
+          enum:
+            - BASIC
+            - PREMIUM
+            - ENTERPRISE
+        startDate:
+          type: string
+        endDate:
+          type: string
+        concurrencyLimit:
+          type: integer
+          format: int32
+x-tagGroups:
+  - name: OpenAPI definition
+    tags:
+      - dashboard-controller
+      - customer-controller
