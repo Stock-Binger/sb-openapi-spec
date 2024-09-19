@@ -1,0 +1,51 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://app.stockbinger.com:9092
+  description: Generated server url
+paths:
+  /u:
+    get:
+      tags:
+      - customer-controller
+      operationId: getSubscription
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SubscriptionResponse"
+  /u/profile:
+    get:
+      tags:
+      - customer-controller
+      operationId: profile
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema: {}
+components:
+  schemas:
+    SubscriptionResponse:
+      properties:
+        userId:
+          type: integer
+          format: int64
+        plan:
+          type: string
+          enum:
+          - BASIC
+          - PREMIUM
+          - ENTERPRISE
+        startDate:
+          type: string
+        endDate:
+          type: string
+        concurrencyLimit:
+          type: integer
+          format: int32
