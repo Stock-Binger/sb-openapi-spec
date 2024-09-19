@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # Ensure the token has write permissions
+
 jobs:
   merge-openapi:
     runs-on: ubuntu-latest
@@ -16,20 +19,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Merge OpenAPI YAML files using npx
+      - name: Pre-process OpenAPI files (replace patterns in sb-openapi*.yml files)
+        run: |
+          SPEC_DIR=$(pwd)
+          # Find all sb-openapi*.yml files except sb-openapi-spec.yml
+          OPENAPI_FILES=$(find $SPEC_DIR -name "sb-openapi*.yml" | grep -v "sb-openapi-spec.yml")
+          
+          # Loop over each file and replace the URLs
+          for FILE in $OPENAPI_FILES; do
+            sed -i 's|http://app.stockbinger.com:[0-9]*|https://app.stockbinger.com|g' "$FILE"
+            sed -i 's|http://localhost:[0-9]*|https://app.stockbinger.com|g' "$FILE"
+            sed -i 's|http://127.0.0.1:[0-9]*|https://app.stockbinger.com|g' "$FILE"
+            echo "Updated URLs in $FILE"
+          done
+
+      - name: Merge OpenAPI YAML files using npx, excluding sb-openapi-spec.yml
         run: |
           SPEC_DIR=$(pwd)
           OUTPUT_FILE="$SPEC_DIR/sb-openapi-spec.yml"
-          OPENAPI_FILES=$(ls $SPEC_DIR/sb-openapi*.yml)
+          OPENAPI_FILES=$(find $SPEC_DIR -name "sb-openapi*.yml" | grep -v "sb-openapi-spec.yml")
           npx @redocly/cli join $OPENAPI_FILES -o $OUTPUT_FILE
           echo "OpenAPI files merged into $OUTPUT_FILE"
-
-      - name: Update 'servers' URLs to remove port numbers
-        run: |
-          sed -i 's|http://app.stockbinger.com:[0-9]*|http://app.stockbinger.com|g' $OUTPUT_FILE
-          sed -i 's|http://localhost:[0-9]*|http://app.stockbinger.com|g' $OUTPUT_FILE
-          sed -i 's|http://127.0.0.1:[0-9]*|http://app.stockbinger.com|g' $OUTPUT_FILE
-          echo "Updated servers URL in OpenAPI spec."
 
       - name: Commit and Push Merged OpenAPI Spec
         run: |
