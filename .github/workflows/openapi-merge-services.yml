@@ -16,11 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Merge OpenAPI YAML files using npx
+      - name: Merge OpenAPI YAML files using npx, excluding sb-openapi-spec.yml
         run: |
           SPEC_DIR=$(pwd)
           OUTPUT_FILE="$SPEC_DIR/sb-openapi-spec.yml"
-          OPENAPI_FILES=$(ls $SPEC_DIR/sb-openapi*.yml)
+          OPENAPI_FILES=$(find $SPEC_DIR -name "sb-openapi*.yml" | grep -v "sb-openapi-spec.yml")
           npx @redocly/cli join $OPENAPI_FILES -o $OUTPUT_FILE
           echo "OpenAPI files merged into $OUTPUT_FILE"
 
