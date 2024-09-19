@@ -30,6 +30,7 @@ jobs:
             sed -i 's|http://app.stockbinger.com:[0-9]*|https://app.stockbinger.com|g' "$FILE"
             sed -i 's|http://localhost:[0-9]*|https://app.stockbinger.com|g' "$FILE"
             sed -i 's|http://127.0.0.1:[0-9]*|https://app.stockbinger.com|g' "$FILE"
+            sed -i 's|https://app.stockbinger.com:[0-9]*|https://app.stockbinger.com|g' "$FILE"
             echo "Updated URLs in $FILE"
           done
 
@@ -45,8 +46,8 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "GitHub Actions Bot"
-          git add sb-openapi-spec.yml
-          git commit -m "Merge and update OpenAPI specs"
+          git add .
+          git commit -m "Update and Merge OpenAPI specs"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
