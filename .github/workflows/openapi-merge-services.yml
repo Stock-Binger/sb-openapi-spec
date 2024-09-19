@@ -1,0 +1,42 @@
+name: Merge OpenAPI Specs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  merge-openapi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Merge OpenAPI YAML files using npx
+        run: |
+          SPEC_DIR=$(pwd)
+          OUTPUT_FILE="$SPEC_DIR/sb-openapi-spec.yml"
+          OPENAPI_FILES=$(ls $SPEC_DIR/sb-openapi*.yml)
+          npx @redocly/cli join $OPENAPI_FILES -o $OUTPUT_FILE
+          echo "OpenAPI files merged into $OUTPUT_FILE"
+
+      - name: Update 'servers' URLs to remove port numbers
+        run: |
+          sed -i 's|http://app.stockbinger.com:[0-9]*|http://app.stockbinger.com|g' $OUTPUT_FILE
+          sed -i 's|http://localhost:[0-9]*|http://app.stockbinger.com|g' $OUTPUT_FILE
+          sed -i 's|http://127.0.0.1:[0-9]*|http://app.stockbinger.com|g' $OUTPUT_FILE
+          echo "Updated servers URL in OpenAPI spec."
+
+      - name: Commit and Push Merged OpenAPI Spec
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "GitHub Actions Bot"
+          git add sb-openapi-spec.yml
+          git commit -m "Merge and update OpenAPI specs"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

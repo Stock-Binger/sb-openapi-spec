@@ -3,7 +3,7 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-- url: http://localhost:9091
+- url: http://app.stockbinger.com:9091
   description: Generated server url
 paths:
   /v1/d/prompt:
@@ -12,22 +12,11 @@ paths:
       - dashboard-controller
       operationId: getUserPrompts
       parameters:
-      - name: X-User-Id
-        in: header
+      - name: offset
+        in: query
         required: false
         schema:
-          type: integer
-          format: int64
-          default: 1001
-      - name: X-Group-Id
-        in: header
-        required: false
-        schema:
-          type: array
-          default: "[0, 1]"
-          items:
-            type: integer
-            format: int64
+          type: string
       responses:
         "200":
           description: OK
@@ -59,22 +48,11 @@ paths:
       - dashboard-controller
       operationId: getAllPrompts
       parameters:
-      - name: X-User-Id
-        in: header
+      - name: offset
+        in: query
         required: false
         schema:
-          type: integer
-          format: int64
-          default: 1001
-      - name: X-Group-Id
-        in: header
-        required: false
-        schema:
-          type: array
-          default: "[0, 1]"
-          items:
-            type: integer
-            format: int64
+          type: string
       responses:
         "200":
           description: OK
@@ -106,7 +84,6 @@ components:
             rawOffset:
               type: integer
               format: int32
-    AttributeValue: {}
     PromptResponse:
       properties:
         userId:
@@ -145,7 +122,5 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PromptResponse"
-        offsetKey:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/AttributeValue"
+        nextOffset:
+          type: string
