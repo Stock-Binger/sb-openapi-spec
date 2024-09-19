@@ -3,7 +3,7 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-- url: http://app.stockbinger.com:9091
+- url: https://app.stockbinger.com
   description: Generated server url
 paths:
   /v1/d/prompt:
