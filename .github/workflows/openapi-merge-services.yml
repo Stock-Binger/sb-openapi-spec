@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
 
 permissions:
   contents: write  # Ensure the token has write permissions
@@ -19,19 +21,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Determine Base URL Based on Branch
+        id: set-url
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "base_url=https://app.stockbinger.com" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "base_url=http://dev.stockbinger.com" >> $GITHUB_ENV
+          else
+            echo "Unsupported branch: ${{ github.ref }}"
+            exit 1
+          fi
+
       - name: Pre-process OpenAPI files (replace patterns in sb-openapi*.yml files)
         run: |
           SPEC_DIR=$(pwd)
+          BASE_URL=${{ env.base_url }}
           # Find all sb-openapi*.yml files except sb-openapi-spec.yml
           OPENAPI_FILES=$(find $SPEC_DIR -name "sb-openapi*.yml" | grep -v "sb-openapi-spec.yml")
           
           # Loop over each file and replace the URLs
           for FILE in $OPENAPI_FILES; do
-            sed -i 's|http://app.stockbinger.com:[0-9]*|https://app.stockbinger.com|g' "$FILE"
-            sed -i 's|http://localhost:[0-9]*|https://app.stockbinger.com|g' "$FILE"
-            sed -i 's|http://127.0.0.1:[0-9]*|https://app.stockbinger.com|g' "$FILE"
-            sed -i 's|https://app.stockbinger.com:[0-9]*|https://app.stockbinger.com|g' "$FILE"
-            echo "Updated URLs in $FILE"
+            sed -i 's|http://app.stockbinger.com:[0-9]*|'$BASE_URL'|g' "$FILE"
+            sed -i 's|http://localhost:[0-9]*|'$BASE_URL'|g' "$FILE"
+            sed -i 's|http://127.0.0.1:[0-9]*|'$BASE_URL'|g' "$FILE"
+            sed -i 's|https://app.stockbinger.com:[0-9]*|'$BASE_URL'|g' "$FILE"
+            echo "Updated URLs in $FILE to use $BASE_URL"
           done
 
       - name: Merge OpenAPI YAML files using npx, excluding sb-openapi-spec.yml
@@ -47,7 +62,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "GitHub Actions Bot"
           git add .
-          git commit -m "Update and Merge OpenAPI specs"
+          git commit -m "Update and Merge OpenAPI specs for ${{ github.ref }}"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
