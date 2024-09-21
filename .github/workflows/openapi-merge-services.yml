@@ -27,7 +27,7 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "base_url=https://app.stockbinger.com" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
-            echo "base_url=http://dev.stockbinger.com" >> $GITHUB_ENV
+            echo "base_url=http://localhost:9090" >> $GITHUB_ENV
           else
             echo "Unsupported branch: ${{ github.ref }}"
             exit 1
